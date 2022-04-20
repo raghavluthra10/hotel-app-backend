@@ -1,0 +1,10 @@
+{
+  "development": {
+    "username": "fountane",
+    "password": null,
+    "database": "hotel-app-database",
+    "host": "localhost",
+    "dialect": "postgres",
+    "port": 5432
+  }
+}
