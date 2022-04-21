@@ -1,11 +1,14 @@
+const db = require("../models/index.js");
+// const list = require("../models/list");
+
 const getAllHotels = async (req, res) => {
   try {
     // look for all lists in db
-    const data = "all lists";
-    // send back as response
+    const hotelList = await db.hotelList.findAll({});
+
     res.status(200).json({
       success: true,
-      data: data,
+      data: hotelList,
     });
   } catch (error) {
     console.error(error);
