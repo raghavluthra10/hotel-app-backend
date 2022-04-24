@@ -2,14 +2,7 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    /**
-     * Add altering commands here.
-     *
-     * Example:
-     * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
-     */
-
-    await queryInterface.createTable("hotel", {
+    await queryInterface.createTable("hotels", {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -20,8 +13,14 @@ module.exports = {
         type: Sequelize.STRING,
       },
       owner_id: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: false,
+        references: {
+          model: {
+            tableName: "owners",
+          },
+          key: "id",
+        },
       },
       description: {
         type: Sequelize.STRING,
@@ -44,12 +43,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    /**
-     * Add reverting commands here.
-     *
-     * Example:
-     * await queryInterface.dropTable('users');
-     */
-    await queryInterface.dropTable("hotel");
+    await queryInterface.dropTable("hotels");
   },
 };

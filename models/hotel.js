@@ -20,11 +20,19 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
       },
       hotel_name: DataTypes.STRING,
-      owner_id: DataTypes.STRING,
+      owner_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: {
+            tableName: "owners",
+          },
+          key: "id",
+        },
+      },
       description: DataTypes.STRING,
       bhk: DataTypes.INTEGER,
       price_per_night: DataTypes.INTEGER,
-      booked_range: DataTypes.STRING,
       created_at: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -37,6 +45,9 @@ module.exports = (sequelize, DataTypes) => {
     {
       sequelize,
       modelName: "hotel",
+    },
+    {
+      tableName: "hotels",
     }
   );
   return hotel;
