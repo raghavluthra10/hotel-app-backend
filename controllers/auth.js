@@ -14,39 +14,46 @@ async function signUp(req, res) {
       });
     }
 
-    // check if the user with the same email id exists
-    if (role === "customer") {
-      const checkIfCustomerAlreadyExists = await db.customer.findOne({
-        where: { email: email },
-        attributes: ["id"],
-      });
+    // check if the user with the same email id exists with the given role
+  
+    let checkIfUserAlreadyExists = await db.user.findOne({
+      where: {email: email},
+      attributes: ['id', 'role']
+    })
 
-      if (checkIfCustomerAlreadyExists) {
-        return res.status(400).json({
-          success: false,
-          message: "Customer already exists",
-        });
-      }
+    const { role: userNotAvailable } = checkIfUserAlreadyExists
 
-      // encrypt password
-      //   const encryptedPassword = await
+    if(checkIfUserAlreadyExists) {
+      res.status(409).json({
+        success: false,
+        message: `User already exists as a ${userNotAvailable}`
+      })
     }
 
-    if (role === "hotel_owner") {
-      const checkIfOwnerAlreadyExists = await db.owner.findOne({
-        where: { email: email },
-        attributes: ["id"],
-      });
+    // hash and salt the password
+    const saltRounds = 10;
 
-      if (checkIfOwnerAlreadyExists) {
-        return res.status(400).json({
-          success: false,
-          message: "Hotel owner already exists",
-        });
-      }
+    bcrypt.genSalt(saltRounds, function (err, salt) {
+      bcrypt.hash(password, salt, function(err, hash) {
+        
+        const newUser = db.user.build({
+          name: `${first_name} ${last_name}`,
+          email: email,
+          password: hash,
+          role: role
+        })
 
-      // encrypt password
-    }
+        await newUser.save()
+      })
+    })
+
+    return res.status(200).json({
+      success: true,
+      message: "Successfully signed up"
+    })
+
+    
+
   } catch (error) {
     res.status(400).json({
       success: false,
@@ -65,7 +72,10 @@ function login(req, res) {
   }
 }
 
+function logout(req, res) {}
+
 module.exports = {
   signUp,
   login,
+  logout,
 };
