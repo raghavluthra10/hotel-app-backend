@@ -26,6 +26,10 @@ db.hotel.belongsTo(db.owner, {
   foreignKey: "owner_id",
 });
 
+db.owner.hasOne(db.hotel, {
+  foreignKey: "owner_id",
+});
+
 db.cart.belongsTo(db.hotel, {
   foreignKey: "hotel_id",
 });
