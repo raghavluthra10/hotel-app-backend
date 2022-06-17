@@ -5,6 +5,9 @@
     "database": "hotel-app-database",
     "host": "localhost",
     "dialect": "postgres",
-    "port": 5432
+    "port": 5432,
+    "define": {
+      "timestamps": false
+    }
   }
 }
