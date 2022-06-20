@@ -1,69 +1,73 @@
 const db = require("../models/db.js");
 const bcrypt = require("bcrypt");
+const {
+  successResponse,
+  errorResponse,
+  serverErrorResponse,
+} = require("../helper/responses");
+const jwt = require("jsonwebtoken");
+const env = require("dotenv");
 
 async function signUp(req, res) {
   try {
-    // extract credentials from req.body
-    const { first_name, last_name, email, password, role } = req.body;
+    const { first_name, last_name, email, password, role, dob, address } =
+      req.body;
+    console.log("req body =====>", req.body);
 
-    // validate if all entries are send
-    if (!(first_name & last_name & email & password & role)) {
+    if (!first_name || !last_name || !email || !password || !role) {
+      console.log("some credentials are missing");
       return res.status(400).json({
         success: false,
         message: "Please send all required credentials",
       });
     }
 
-    // check if the user with the same email id exists with the given role
-  
-    let checkIfUserAlreadyExists = await db.user.findOne({
-      where: {email: email},
-      attributes: ['id', 'role']
-    })
+    const checkIfUserAlreadyExists = await db.user.findAll({
+      where: {
+        email: email,
+        role: role,
+      },
+      attributes: ["email", "role"],
+    });
 
-    const { role: userNotAvailable } = checkIfUserAlreadyExists
+    console.log("checkIfUserAlreadyExists ====> ", checkIfUserAlreadyExists);
 
-    if(checkIfUserAlreadyExists) {
-      res.status(409).json({
-        success: false,
-        message: `User already exists as a ${userNotAvailable}`
-      })
+    if (checkIfUserAlreadyExists.length > 0) {
+      const roleExistsAs = checkIfUserAlreadyExists[0].role;
+      const message = `User already Exists as a ${roleExistsAs}!`;
+      return errorResponse(res, 404, message);
     }
 
-    // hash and salt the password
     const saltRounds = 10;
 
     bcrypt.genSalt(saltRounds, function (err, salt) {
-      bcrypt.hash(password, salt, function(err, hash) {
-        
-        const newUser = db.user.build({
+      bcrypt.hash(password, salt, function (err, hash) {
+        console.log("hashed password =====", hash);
+        db.user.create({
           name: `${first_name} ${last_name}`,
-          email: email,
+          email,
           password: hash,
-          role: role
-        })
-
-        await newUser.save()
-      })
-    })
-
-    return res.status(200).json({
-      success: true,
-      message: "Successfully signed up"
-    })
-
-    
-
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: "Couldn't sign up",
+          role,
+          dob,
+          address,
+        });
+      });
     });
+
+    return successResponse(res, 200, "SuccessFully signed up!");
+  } catch (error) {
+    return serverErrorResponse(res, 500, error);
   }
 }
 
-function login(req, res) {
+async function login(req, res) {
   try {
+    const { email, password } = req.body;
+
+    // const user = email
+
+    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
+    res.json({ accessToken });
   } catch (error) {
     res.status(400).json({
       success: false,
@@ -72,10 +76,8 @@ function login(req, res) {
   }
 }
 
-function logout(req, res) {}
-
 module.exports = {
   signUp,
   login,
-  logout,
+  timepass,
 };

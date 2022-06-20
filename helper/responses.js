@@ -9,6 +9,9 @@ function successResponse(res, statusCode, data) {
 }
 
 function errorResponse(res, statusCode, message) {
+  if (!message) {
+    message = null;
+  }
   return res.status(statusCode).json({
     success: false,
     message: message,
@@ -16,10 +19,11 @@ function errorResponse(res, statusCode, message) {
 }
 
 // internal server error
-function serverErrorResponse(res, statusCode) {
+function serverErrorResponse(res, statusCode, error) {
   return res.status(statusCode).json({
     success: false,
     message: "Internal Server Error!",
+    err: error ? error.message : error,
   });
 }
 
@@ -41,6 +45,7 @@ function unauthenticated(res) {
 
 module.exports = {
   successResponse,
+  errorResponse,
   serverErrorResponse,
   unauthorized,
   unauthenticated,
