@@ -7,6 +7,7 @@ const {
 } = require("../helper/responses");
 const jwt = require("jsonwebtoken");
 const env = require("dotenv");
+const axios = require("axios");
 
 async function signUp(req, res) {
   try {
@@ -15,7 +16,6 @@ async function signUp(req, res) {
     console.log("req body =====>", req.body);
 
     if (!first_name || !last_name || !email || !password || !role) {
-      console.log("some credentials are missing");
       return res.status(400).json({
         success: false,
         message: "Please send all required credentials",
@@ -62,22 +62,55 @@ async function signUp(req, res) {
 
 async function login(req, res) {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
 
-    // const user = email
+    if (!email || !password || !role) {
+      return res.status(400).json({
+        success: false,
+        message: "Please send all required credentials",
+      });
+    }
 
-    const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET);
-    res.json({ accessToken });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      message: "User does not exists!",
+    const getTheUser = await db.user.findOne({
+      where: {
+        email: email,
+        role: role,
+      },
+      attributes: ["password", "email", "role"],
     });
+
+    if (!getTheUser) {
+      const message = "User does not exists!";
+      return errorResponse(res, 404, message);
+    }
+
+    console.log("getTheUser ======", getTheUser);
+
+    const hashedPassword = getTheUser.password;
+    console.log("hashedPasswrod =====", hashedPassword);
+
+    bcrypt.compare(password, hashedPassword, function (err, result) {
+      if (!result) {
+        return errorResponse(res, 403, `Wrong password`);
+      }
+    });
+
+    //  create token
+    const token = jwt.sign(
+      { id: getTheUser.email },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: 86400 }
+    );
+
+    return successResponse(res, 200, {
+      token,
+    });
+  } catch (error) {
+    return serverErrorResponse(res, 500, error);
   }
 }
 
 module.exports = {
   signUp,
   login,
-  timepass,
 };

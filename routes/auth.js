@@ -1,11 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { getAllHotels, getOne } = require("../controllers/list");
-const { signUp, login, timepass } = require("../controllers/auth");
-const {
-  authHotelOwner,
-  authCustomer,
-} = require("../middleware/auth-middleware");
+const { signUp, login } = require("../controllers/auth");
 
 // ROUTES
 router.post("/signup", signUp);
