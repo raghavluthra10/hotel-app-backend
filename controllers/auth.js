@@ -13,7 +13,6 @@ async function signUp(req, res) {
   try {
     const { first_name, last_name, email, password, role, dob, address } =
       req.body;
-    console.log("req body =====>", req.body);
 
     if (!first_name || !last_name || !email || !password || !role) {
       return res.status(400).json({
@@ -43,14 +42,21 @@ async function signUp(req, res) {
     bcrypt.genSalt(saltRounds, function (err, salt) {
       bcrypt.hash(password, salt, function (err, hash) {
         console.log("hashed password =====", hash);
-        db.user.create({
-          name: `${first_name} ${last_name}`,
-          email,
-          password: hash,
-          role,
-          dob,
-          address,
-        });
+        db.user
+          .create({
+            name: `${first_name} ${last_name}`,
+            email,
+            password: hash,
+            role,
+            dob,
+            address,
+          })
+          .then(() => {
+            console.log("new user successfully created");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
       });
     });
 
@@ -76,7 +82,7 @@ async function login(req, res) {
         email: email,
         role: role,
       },
-      attributes: ["password", "email", "role"],
+      attributes: ["password", "email", "role", "id"],
     });
 
     if (!getTheUser) {
