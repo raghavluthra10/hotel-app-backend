@@ -5,6 +5,7 @@ const { errorResponse } = require("../helper/responses");
 
 const authUser = (req, res, next) => {
   const token = req.headers["x-access-token"];
+  const { role } = req.body;
 
   if (!token) {
     return errorResponse(res, 400, "Token missing!!!");
@@ -17,6 +18,7 @@ const authUser = (req, res, next) => {
         .send({ auth: false, message: "Failed to authenticate token." });
     }
     req.user = decoded.id;
+    req.role = decoded.role;
     next();
   });
 };

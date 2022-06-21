@@ -97,7 +97,7 @@ async function login(req, res) {
 
     //  create token
     const token = jwt.sign(
-      { id: getTheUser.email },
+      { id: getTheUser.email, role: getTheUser.role },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: 86400 }
     );
