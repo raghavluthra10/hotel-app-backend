@@ -23,29 +23,17 @@ db.cart = require("./cart")(sequelize, Sequelize);
 db.user = require("./users")(sequelize, Sequelize);
 
 // relations
-db.hotel.belongsTo(db.owner, {
-  foreignKey: "owner_id",
-});
-db.owner.hasOne(db.hotel, {
-  foreignKey: "owner_id",
-});
-
-db.user.hasOne(db.cart, {
-  foreignKey: "customer_id",
-});
-
-db.user.hasOne(db.hotel, {
-  foreignKey: "hotel_owner_id",
-});
 
 db.cart.belongsTo(db.hotel, {
   foreignKey: "hotel_id",
 });
 
-// db.cart.belongsTo(db.hotel, {
-//   foreignKey: "customer_id",
-// });
+db.cart.belongsTo(db.user, {
+  foreignKey: "user_id",
+});
 
-// cart belongs to many
+db.hotel.belongsTo(db.user, {
+  foreignKey: "user_id",
+});
 
 module.exports = db;

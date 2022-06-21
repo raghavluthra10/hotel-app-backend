@@ -19,14 +19,14 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         type: DataTypes.INTEGER,
       },
-      customer_id: {
-        type: DataTypes.INTEGER,
+      user_id: {
+        type: DataTypes.STRING,
         allowNull: false,
         references: {
           model: {
-            tableName: "customers",
+            tableName: "users",
           },
-          key: "id",
+          key: "email",
         },
       },
       hotel_id: {
@@ -41,11 +41,11 @@ module.exports = (sequelize, DataTypes) => {
       },
       created_at: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
       },
       updated_at: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {

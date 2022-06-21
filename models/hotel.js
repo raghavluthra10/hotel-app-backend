@@ -20,14 +20,14 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
       },
       hotel_name: DataTypes.STRING,
-      owner_id: {
-        type: DataTypes.INTEGER,
+      user_id: {
+        type: DataTypes.STRING,
         allowNull: false,
         references: {
           model: {
-            tableName: "owners",
+            tableName: "users",
           },
-          key: "id",
+          key: "email",
         },
       },
       description: DataTypes.STRING,
@@ -35,11 +35,11 @@ module.exports = (sequelize, DataTypes) => {
       price_per_night: DataTypes.INTEGER,
       created_at: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
       },
       updated_at: {
         type: DataTypes.DATE,
-        allowNull: false,
+        allowNull: true,
       },
     },
     {
