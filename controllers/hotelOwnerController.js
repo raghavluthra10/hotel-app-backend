@@ -15,7 +15,7 @@ const getMyHotels = async (req, res) => {
       return unauthorized(res);
     }
 
-    const getHotelOwnersHotels = await db.hotel.findAll({
+    const getHotelOwnersHotels = await db.hotel.findAndCountAll({
       where: {
         user_id: id,
       },
@@ -74,7 +74,6 @@ const createNewHotel = async (req, res) => {
 const updateHotel = async (req, res) => {
   try {
     const role = req.role;
-    const id = req.user;
 
     const hotel_id = req.query.hotel_id;
 
@@ -94,6 +93,18 @@ const updateHotel = async (req, res) => {
 
     if (!hotel_name || !description || !bhk || !price_per_night) {
       return errorResponse(res, 422, "Please send all parameters");
+    }
+
+    const checkIfHotelExists = await db.hotel.findOne({
+      where: { id: hotel_id },
+    });
+
+    if (!checkIfHotelExists) {
+      return errorResponse(
+        res,
+        404,
+        "hotel you want to update does not exists!!!"
+      );
     }
 
     const updateHotel = await db.hotel.update(
@@ -116,8 +127,43 @@ const updateHotel = async (req, res) => {
 
 // delete
 
+const deleteHotel = async (req, res) => {
+  try {
+    const role = req.role;
+
+    const hotel_id = req.query.hotel_id;
+
+    console.log("deleteHotel= ==== = = ", role, hotel_id);
+
+    if (role !== "hotel_owner") {
+      return unauthorized(res);
+    }
+
+    const checkIfHotelExists = await db.hotel.findOne({
+      where: { id: hotel_id },
+    });
+
+    if (!checkIfHotelExists) {
+      return errorResponse(
+        res,
+        404,
+        "hotel you want to delete does not exists!!!"
+      );
+    }
+
+    await db.hotel.destroy({
+      where: { id: hotel_id },
+    });
+
+    return successResponse(res, 200, "Hotel was deleted!!!");
+  } catch (error) {
+    return serverErrorResponse(res, 500, error);
+  }
+};
+
 module.exports = {
   getMyHotels,
   createNewHotel,
   updateHotel,
+  deleteHotel,
 };
