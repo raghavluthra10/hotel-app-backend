@@ -1,12 +1,11 @@
 steps:
 
-- sign up new hotel owner
-- login as hotel owner
-- add new hotel
-- delete hotel
-- edit hotel
 
-- add middleware for auth
-- change customers and hotl-owneers to users. single table where info for all roles be there
+
 - connect mongo db for unstructered data
-- connect firebase for storage of images
+- add google could storage for images/videos
+
+EXTRA
+
+- add check email format while the email is being typed in signup and login
+- make sure if someone is logged in as "customer" is not able to access "hotel_owner" routes
